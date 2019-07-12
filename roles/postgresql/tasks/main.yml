@@ -45,20 +45,10 @@
   become_user: postgres
   tags: postgresql_geonetwork
 
-- include: geofence.yml
-  become: yes
-  become_user: postgres
-  tags: postgresql_geofence
-
 - include: other_schemas.yml
   become: yes
   become_user: postgres
   tags: postgresql_other_schemas
-
-- include: geofence_gsinstance.yml
-  become: yes
-  become_user: postgres
-  tags: postgresql_geofence_gsinstance
 
 - include: cadastrapp.yml
   tags: postgresql_cadastrapp
