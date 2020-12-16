@@ -1,16 +1,33 @@
 - name: installing apache2
-  apt:
-    pkg: apache2
+  package: 
+    name: "{{ apache_package_name }}"
     state: present
+    use: "{{ package_manager }}"    
+
+- name: installing openssl
+  package: 
+    name: openssl, mod_ssl
+    state: present
+    use: "{{ package_manager }}" 
 
 - name: disable the default site
   file:
-    path: "/etc/apache2/sites-enabled/{{ item }}"
+    path: "/etc/{{ apache_service_name }}/sites-enabled/{{ item }}"
     state: absent
   with_items:
   - 000-default
   - default-ssl
   notify: reload apache2
+  when: package_manager == "apt" 
+
+- name: disable the default site Centos
+  file:
+    path: "/etc/{{ apache_service_name }}/conf.d/{{ item }}"
+    state: absent
+  with_items:
+  - welcome.conf
+  notify: reload apache2
+  when: package_manager == "yum" 
 
 - name: enable required modules
   apache2_module:
@@ -19,32 +36,41 @@
   with_items:
   - proxy_http
   - proxy
-  - ssl
   - rewrite
   - headers
   - deflate
+  - ssl
   register: apache_modules
 
 - name: reload apache2 if needed
   service:
-    name: apache2
+    name: "{{ apache_service_name }}"
     state: reloaded
   when: apache_modules is changed
 
 - name: template georchestra vhost
   template:
     src: georchestra.j2
-    dest: /etc/apache2/sites-available/georchestra.conf
+    dest:  "/etc/{{ apache_service_name }}/conf.d/georchestra.conf"
   notify: reload apache2
+  when: package_manager == "yum" 
+
+- name: template georchestra vhost
+  template:
+    src: georchestra.j2
+    dest:  "/etc/{{ apache_service_name }}/sites-available/georchestra.conf"
+  notify: reload apache2
+  when: package_manager == "apt" 
 
 - name: enable georchestra vhost
   file:
-    dest: /etc/apache2/sites-enabled/georchestra.conf
-    src: /etc/apache2/sites-available/georchestra.conf
+    dest:  "/etc/{{ apache_service_name }}/sites-enabled/georchestra.conf"
+    src:  "/etc/{{ apache_service_name }}/sites-available/georchestra.conf"
     state: link
     owner: root
     group: root
   notify: reload apache2
+  when: package_manager == "apt" 
 
 - name: create web directories
   file:
@@ -59,7 +85,7 @@
   file:
     name: /var/www/georchestra/logs/
     state: directory
-    group: www-data
+    group: "{{ apache_user_name }}"
     mode: 0775
 
 - name: clone htdocs dir
@@ -73,13 +99,6 @@
   get_url:
     dest: /var/www/georchestra/htdocs/errors/50x.html
     url: https://raw.githubusercontent.com/georchestra/htdocs/master/errors/50x.html
-
-- name: create recaptcha response if needed
-  tags: fucaptcha
-  copy:
-    dest: /var/www/georchestra/htdocs/fuckyougoogle.json
-    content: "{ success: true }\n"
-  when: console_captcha.privateKey == ''
 
 - name: template config fragments
   tags: apache_config
@@ -100,6 +119,7 @@
   - { src: common, dest: console }
   - { src: common, dest: mapfishapp }
   - { src: common, dest: cadastrapp }
+  - { src: common, dest: mviewer }
   notify: reload apache2
 
 - name: generate self-signed cert
@@ -107,16 +127,37 @@
     openssl req -new -nodes -x509 -subj "/C=FR/L=Somewhere/O=IT/CN={{ georchestra.fqdn }}"
       -days 3650 -keyout /var/www/georchestra/ssl/georchestra.key -out /var/www/georchestra/ssl/georchestra.crt -extensions v3_ca
     creates=/var/www/georchestra/ssl/georchestra.crt
+  when: existing_certificate_path_crt is not defined or existing_certificate_path_crt == "none" 
+
+- name: copy existing certificate key
+  copy:
+      src: "{{ existing_certificate_path_key }}"
+      dest: /var/www/georchestra/ssl/georchestra.key
+      remote_src: yes
+  when: existing_certificate_path_key != "none"
+
+- name: copy existing certificate crt
+  copy:
+      src: "{{ existing_certificate_path_crt }}"
+      dest: /var/www/georchestra/ssl/georchestra.crt
+      remote_src: yes
+  when: existing_certificate_path_crt != "none"
 
 - name: fix perms on certificate
   file:
     path: /var/www/georchestra/ssl/georchestra.key
     mode: 0400
 
-- name: install ca-certificates-java
-  tags: keystore
-  apt:
-    pkg: ca-certificates-java
+- name: install ca-certificates
+  package: 
+    name: "{{ cacertificate_package_name }}"
+    state: present
+    use: "{{ package_manager }}"
+
+- name: update cacert to enable
+  command: 
+    update-ca-trust force-enable 
+  when: package_manager == "yum" 
 
 - name: overwrite jks-keystore hook
   tags: keystore
@@ -124,26 +165,27 @@
     src: jks-keystore
     dest: /etc/ca-certificates/update.d/jks-keystore
     mode: 0755
+  when: package_manager == "apt" 
 
 - name: symlink cert for ca-certificates
   tags: keystore
   file:
     src: /var/www/georchestra/ssl/georchestra.crt
-    dest: /usr/local/share/ca-certificates/georchestra.crt
+    dest: "{{ cacertificate_path }}/georchestra.crt"
     state: link
   register: cert_symlinked
 
 - name: insert selfsigned cert into systemwide store
   tags: keystore
   command:
-    update-ca-certificates
-  when: cert_symlinked is changed
+    "{{ cacerfificate_update_comande }}"
+  when: cert_symlinked is changed 
 
 - name: symlink keystore
   tags: keystore
   file:
     src: /etc/ssl/certs/java/cacerts
-    dest: /usr/lib/jvm/adoptopenjdk-8-hotspot-amd64/jre/lib/security/cacerts
+    dest: "{{ java_home }}/jre/lib/security/cacerts"
     force: yes
     state: link
 

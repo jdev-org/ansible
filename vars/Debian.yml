@@ -1,4 +1,5 @@
 package_manager: apt
+java_home: /usr/lib/jvm/adoptopenjdk-8-hotspot-amd64
 
 git_package_name: git
 
@@ -17,3 +18,12 @@ tomcat_package_name: tomcat9, tomcat9-user, libservlet3.1-java, libtcnative-1
 # libservlet3.1-java #debian bug 867147
 # libtcnative-1 #APR native libs
 tomcat_service_name: tomcat9
+
+apache_package_name: apache2
+apache_service_name: apache2
+apache_user_name: www-data
+
+cacertificate_package_name: ca-certificates-java
+cacertificate_filename: ca-certificates.crt
+cacertificate_path: /usr/local/share/ca-certificates/
+cacerfificate_update_comande: update-ca-certificate

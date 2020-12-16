@@ -1,0 +1,39 @@
+- name: Populate service facts
+  service_facts:
+
+# Disable Firewall during Installation
+- name: Disable Firewall  
+  service:
+    name: firewalld
+    state: stopped
+    enabled: no
+  when: "'firewalld' in services"
+
+- name: Check that the Selinux is installed
+  stat:
+    path: /etc/selinux/config
+  register: stat_result
+
+- name: manage selinux
+  package: 
+    name: libselinux-python
+    state: present
+    use: "{{ package_manager }}" 
+  when: stat_result.stat.isdir is defined and stat_result.stat.isdir
+
+- name: Disable SELinux
+  selinux:
+    state: disabled
+  when: stat_result.stat.isdir is defined and stat_result.stat.isdir
+
+# firewall-cmd --permanent --add-service=https
+# firewall-cmd --reload
+# firewall-cmd --list-all
+
+#semanage port -a -t http_port_t -p tcp 85
+#semanage port -a -t http_port_t -p tcp 8180
+#semanage port -a -t http_port_t -p tcp 8109
+#semanage port -a -t http_port_t -p tcp 8280
+#semanage port -a -t http_port_t -p tcp 8209
+#semanage port -a -t http_port_t -p tcp 8380
+#semanage port -a -t http_port_t -p tcp 8309

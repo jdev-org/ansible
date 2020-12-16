@@ -21,6 +21,6 @@
      SSLEngine On
      SSLCertificateFile /var/www/georchestra/ssl/georchestra.crt
      SSLCertificateKeyFile /var/www/georchestra/ssl/georchestra.key
-     SSLCACertificateFile /etc/ssl/certs/ca-certificates.crt
+     SSLCACertificateFile /etc/ssl/certs/{{ cacertificate_filename }}
      ServerSignature Off
 </VirtualHost>

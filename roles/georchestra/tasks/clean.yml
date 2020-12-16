@@ -21,3 +21,4 @@
   apt_repository:
     repo: "deb http://ftp.fr.debian.org/debian/ buster main non-free contrib"
     state: absent
+  when: package_manager == "apt"
