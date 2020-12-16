@@ -1,13 +1,40 @@
-- name: installing dependencies
-  apt:
-    pkg: [git, slapd, ldap-utils]
+- name: Install Git
+  package: 
+    name: "{{ git_package_name }}"
+    state: latest
+    use: "{{ package_manager }}"
+    
+- name: Install Ldap
+  package: 
+    name: "{{ ldap_package_name }}"
     state: present
-    update_cache: yes
+    use: "{{ package_manager }}"
+
+- name: Install Ldap utils
+  package: 
+    name: "{{ ldaputils_package_name }}"
+    state: present
+    use: "{{ package_manager }}"
 
 - name: create temporary directory
   check_mode: no
   shell: mktemp -d
   register: tempdir
+
+- name: remove hdb sldap database
+  file:
+    state: absent
+    path: '/etc/openldap/slapd.d/cn=config/olcDatabase={2}hdb.ldif'
+  when: package_manager == "yum" 
+
+- name: change for mdb database 
+  copy:
+    src: templates/olcDatabase={2}mdb.ldif
+    dest: '/etc/openldap/slapd.d/cn=config/olcDatabase={2}mdb.ldif'
+  when: package_manager == "yum"   
+
+- name: restart slapd
+  service: name=slapd state=restarted   
 
 - name: fetch LDAP files
   check_mode: no
@@ -34,31 +61,47 @@
     { pat: 'userPassword:: e1NIQX1XMlY4d2UrOFdNanpma28rMUtZVDFZcWZFVDQ9', val: "userPassword: {{ geoserver.privileged.pass }}" }]
     - "{{ openldap.ldifs }}"
 
+- name: Add missing ldap module for Centos (cosine)
+  command: >
+    ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/cosine.ldif
+  when: package_manager == "yum"
+  
+- name: Add missing ldap module for Centos (nis)
+  command: >
+    ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/nis.ldif
+  when: package_manager == "yum"
+
+- name: Add missing ldap module for Centos (inetorgperson)
+  command: >
+    ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/inetorgperson.ldif
+  when: package_manager == "yum"
+
 - name: bootstrap the db
   command: >
     ldapadd -Y EXTERNAL -H ldapi:/// -f "{{ tempdir.stdout }}/bootstrap.ldif"
-    creates=/etc/ldap/slapd.d/cn=config/olcDatabase={2}mdb.ldif
+    creates=/etc/"{{ ldap_path_name }}"/slapd.d/cn=config/olcDatabase={2}mdb.ldif
 
 - name: import groupofMembers
   command: >
     ldapadd -Y EXTERNAL -H ldapi:/// -f "{{ tempdir.stdout }}/groupofmembers.ldif"
-    creates=/etc/ldap/slapd.d/cn=config/cn=schema/cn={4}groupofmembers.ldif
+    creates=/etc/{{ ldap_path_name }}/slapd.d/cn=config/cn=schema/cn={4}groupofmembers.ldif
 
 - name: import georchestraSchema
   command: >
     ldapadd -Y EXTERNAL -H ldapi:/// -f "{{ tempdir.stdout }}/georchestraSchema.ldif"
-    creates=/etc/ldap/slapd.d/cn=config/cn=schema/cn={5}georchestra.ldif
+    creates=/etc/{{ ldap_path_name }}/slapd.d/cn=config/cn=schema/cn={5}georchestra.ldif
 
 - name: import openssh
   command: >
     ldapadd -Y EXTERNAL -H ldapi:/// -f "{{ tempdir.stdout }}/openssh.ldif"
-    creates=/etc/ldap/slapd.d/cn=config/cn=schema/cn={6}openssh-lpk-openldap.ldif
+    creates=/etc/{{ ldap_path_name }}/slapd.d/cn=config/cn=schema/cn={6}openssh-lpk-openldap.ldif
 
 # loaded by default in debian's slapd ?
 - name: import memberof
   command: >
     ldapadd -Y EXTERNAL -H ldapi:/// -f "{{ tempdir.stdout }}/memberof.ldif"
-    creates=/etc/ldap/slapd.d/cn=config/olcDatabase={2}mdb/olcOverlay={0}memberof.ldif
+    creates=/etc/{{ ldap_path_name }}/slapd.d/cn=config/olcDatabase={2}mdb/olcOverlay={0}memberof.ldif
+  when: package_manager == "apt"
 
 - name: temporarly store cleartext admin rootpw
   copy:

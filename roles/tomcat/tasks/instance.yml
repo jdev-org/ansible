@@ -1,13 +1,42 @@
 - name: create instance {{ item.key }}
   command: tomcat9-instance-create -p {{ item.value.port }} -c {{ item.value.control_port }} {{ tomcat_basedir }}/{{ item.key }} creates={{ tomcat_basedir }}/{{ item.key }}
   with_dict: "{{ tomcat_instances }}"
+  when: package_manager == "apt"  
+
+- name: create instance {{ item.key }}
+  file:
+    src: /usr/share/tomcat/bin
+    dest: "{{ tomcat_basedir }}//{{ item.key }}//bin"
+    state: directory
+  with_dict: "{{ tomcat_instances }}"
+  when: package_manager == "yum"  
+
+- name: create instance {{ item.key }}
+  file:
+    src: /etc/tomcat/
+    dest: "{{ tomcat_basedir }}//{{ item.key }}//conf"
+    state: directory
+  with_dict: "{{ tomcat_instances }}"
+  when: package_manager == "yum"
+
+  
+- name: Create a directory if it does not exist
+  file:
+    path: "{{ tomcat_basedir }}/{{ item.0 }}/{{ item.1 }}"
+    state: directory
+    mode: '0755'
+  with_nested:
+    - "{{ tomcat_instances|list }}"
+    - [ logs, temp, work, webapps ]
+  when: package_manager == "yum"    
 
 - name: symlink policy.d dir
   file:
-    src: /etc/tomcat9/policy.d/
+    src: "/etc/{{ tomcat_service_name }}/policy.d/"
     dest: "{{ tomcat_basedir }}/{{ item.key }}/conf/policy.d"
     state: link
   with_dict: "{{ tomcat_instances }}"
+  when: package_manager == "apt"
 
 - name: recursively fix dirs ownership
   file:

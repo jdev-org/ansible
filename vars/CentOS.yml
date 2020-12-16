@@ -1,0 +1,16 @@
+package_manager: yum
+
+git_package_name: git
+
+ldap_package_name: openldap
+ldap_service_name: slapd
+
+ldaputils_package_name: openldap-clients, openldap-servers
+
+ldap_path_name: openldap
+
+postgresql_package_name: postgis25_11, postgresql11-server, postgresql11, postgresql11-contrib
+postgresql_service_name: postgresql-11
+
+tomcat_package_name: tomcat, tomcat-webapps
+tomcat_service_name: tomcat

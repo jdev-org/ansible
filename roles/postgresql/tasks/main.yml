@@ -2,24 +2,53 @@
   locale_gen:
     name: "{{ system_locale }}"
     state: present
+  when: package_manager == "apt"
+
+- name: install epel-release
+  package: 
+    name: epel-release
+    state: present
+    use: "{{ package_manager }}"
+  when: package_manager == "yum"
+
+- name: install postgresql repo
+  package: 
+    name: https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+    state: present
+    use: "{{ package_manager }}"
+  when: package_manager == "yum"
 
 - name: install sudo
-  apt:
+  package: 
     name: sudo
     state: present
+    use: "{{ package_manager }}"
 
 - name: installing dependencies
-  apt:
-    pkg: ['postgis', 'postgresql-11-postgis-2.5', 'postgresql-11-postgis-2.5-scripts', 'postgresql-contrib']
+  package: 
+    name: [ "{{ postgresql_package_name }}"]
     state: present
     update_cache: yes
+    use: "{{ package_manager }}"
 # postgresql-11-postgis-2.5-scripts #for postgis.control
 # postgresql-contrib #for dblink extension
 
 - name: install python-psycopg2 for ansible psql modules
-  apt:
+  package: 
     name: python-psycopg2
     state: present
+    use: "{{ package_manager }}"
+
+- name: init postgresql database
+  command: >
+    /usr/pgsql-11/bin/postgresql-11-setup initdb
+  when: package_manager == "yum"
+
+- name: Test if postgresql is running
+  service: 
+    name: "{{ postgresql_service_name }}"
+    state: started
+    enabled: yes
 
 - name: create georchestra user
   become: yes

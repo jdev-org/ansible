@@ -4,6 +4,8 @@
   become: yes
   roles:
     - georchestra
+  vars_files:
+    - [ "../vars/CentOS.yml" ]  
   vars:
     cadastrapp: {
       enabled: false,
