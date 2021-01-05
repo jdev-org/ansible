@@ -3,23 +3,6 @@
   with_dict: "{{ tomcat_instances }}"
   when: package_manager == "apt"  
 
-- name: create instance {{ item.key }}
-  file:
-    src: /usr/share/tomcat/bin
-    dest: "{{ tomcat_basedir }}//{{ item.key }}//bin"
-    state: directory
-  with_dict: "{{ tomcat_instances }}"
-  when: package_manager == "yum"  
-
-- name: create instance {{ item.key }}
-  file:
-    src: /etc/tomcat/
-    dest: "{{ tomcat_basedir }}//{{ item.key }}//conf"
-    state: directory
-  with_dict: "{{ tomcat_instances }}"
-  when: package_manager == "yum"
-
-  
 - name: Create a directory if it does not exist
   file:
     path: "{{ tomcat_basedir }}/{{ item.0 }}/{{ item.1 }}"
@@ -27,8 +10,16 @@
     mode: '0755'
   with_nested:
     - "{{ tomcat_instances|list }}"
-    - [ logs, temp, work, webapps ]
+    - [ logs, conf, temp, work, webapps ]
   when: package_manager == "yum"    
+
+- name: create instance - copy conf
+  synchronize:
+    src: /etc/tomcat/
+    dest: "{{ tomcat_basedir }}/{{ item.key }}/conf"
+  with_dict: "{{ tomcat_instances }}"
+  delegate_to: "{{ inventory_hostname }}"
+  when: package_manager == "yum"
 
 - name: symlink policy.d dir
   file:

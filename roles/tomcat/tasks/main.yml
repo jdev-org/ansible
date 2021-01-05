@@ -1,5 +1,6 @@
 - include: common.yml
 - include: instance.yml
+  tags: tomcat-instance
 - include: cadastrapp.yml
   when: cadastrapp.enabled
 - include: clean.yml

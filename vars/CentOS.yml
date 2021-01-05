@@ -1,5 +1,5 @@
 package_manager: yum
-java_home: /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.272.b10-1.el7_9.x86_64/
+java_home: /etc/alternatives/jre_1.8.0
 
 git_package_name: git
 
@@ -24,3 +24,8 @@ cacertificate_package_name: ca-certificates
 cacertificate_filename: ca-bundle.crt
 cacertificate_path: /etc/pki/ca-trust/source/anchors/
 cacerfificate_update_comande: update-ca-trust extract
+
+# Specific Centos to simplify multiple instance 
+# see https://tomcat.apache.org/tomcat-7.0-doc/RUNNING.txt
+# and https://notesbytom.wordpress.com/2017/03/10/tomcat-multiple-instances-rhel-7-centos-7/
+tomcat_basedir: /var/lib/tomcats/

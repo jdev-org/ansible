@@ -1,27 +1,24 @@
+# Systemd unit file for tomcat instances.
+# 
+# To create clones of this service:
+# 0. systemctl enable tomcat@name.service
+# 1. create catalina.base directory structure in
+#    /var/lib/tomcats/name
+# 2. profit.
+
 [Unit]
 Description=Tomcat - instance {{ item.key }}
 After=syslog.target network.target
 
 [Service]
-Type=forking
-
+Type=simple
+EnvironmentFile=/var/lib/tomcats/%i/conf/tomcat.conf
+Environment="NAME=%i"
+EnvironmentFile=-/etc/default/tomcat-%i
+ExecStart=/usr/libexec/tomcat/server start
+ExecStop=/usr/libexec/tomcat/server stop
+SuccessExitStatus=143
 User=tomcat
-Group=tomcat
-
-Environment=LANG={{ system_locale }}
-Environment=JRE_HOME=JAVA_HOME={{ java_home }}
-Environment=CATALINA_HOME=/usr/share/{{ tomcat_service_name }}
-Environment=CATALINA_TMPDIR=/srv/tomcat/{{ item.key }}/temp
-Environment=CATALINA_PID=/run/tomcat/{{ item.key }}.pid
-PIDFile=/run/tomcat/{{ item.key }}.pid
-
-EnvironmentFile=/etc/default/tomcat-{{ item.key }}
-PassEnvironment=JAVA_OPTS LANG
-
-ExecStart=/usr/libexex/tomcat/server start
-
-SyslogIdentifier=tomcat{{ item.key }}
-Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target
