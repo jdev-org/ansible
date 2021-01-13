@@ -12,6 +12,7 @@ After=syslog.target network.target
 
 [Service]
 Type=simple
+Environment=JRE_HOME=JAVA_HOME={{ java_home }}
 EnvironmentFile=/var/lib/tomcats/%i/conf/tomcat.conf
 Environment="NAME=%i"
 EnvironmentFile=-/etc/default/tomcat-%i

@@ -44,10 +44,25 @@
     /usr/pgsql-11/bin/postgresql-11-setup initdb
   when: package_manager == "yum"
 
+- name: update pg_hba conf
+  lineinfile: 
+    dest: "{{ postgresql_pg_hba_path }}" 
+    insertafter: "^#s.IPv4slocal.+" 
+    line: "host {{ georchestra.db.name }}  {{ georchestra.db.user }} 127.0.0.1/32  md5"
+  tags: postgresql_conf
+  
+- name: update pg_hba conf IPv6
+  lineinfile: 
+    dest: "{{ postgresql_pg_hba_path }}" 
+    insertafter: "^#s.IPv6slocal.+" 
+    line: "host {{ georchestra.db.name }}  {{ georchestra.db.user }} ::1/128 md5"
+  tags: postgresql_conf
+
 - name: Test if postgresql is running
   service: 
     name: "{{ postgresql_service_name }}"
     state: started
+    daemon_reload: yes
     enabled: yes
 
 - name: create georchestra user
@@ -67,6 +82,13 @@
     template: template0
     encoding: UTF8
 
+- name: add postgis extension to db
+  become: true
+  become_user: postgres
+  postgresql_ext:
+    name: postgis
+    db: "{{ georchestra.db.name }}"
+
 - include: geonetwork.yml
   become: yes
   become_user: postgres
@@ -76,6 +98,7 @@
   become: yes
   become_user: postgres
   tags: postgresql_geofence
+  when: geofence.enabled
 
 - include: other_schemas.yml
   become: yes

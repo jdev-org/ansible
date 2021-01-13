@@ -1,12 +1,12 @@
 - name: create wars folder
   file:
-      path: "/usr/share/lib/georchestra/20.0.1"
+      path: "/usr/share/lib/georchestra/{{ georchestra.wars.version }}"
       state: directory
 
 - name: download wars
   get_url:
-    url: "https://packages.georchestra.org/bot/wars/20.0.x/{{ item.key }}-generic.war"
-    dest: "/usr/share/lib/georchestra/20.0.1/{{ item.key }}-generic.war"
+    url: "{{ georchestra.wars.url }}/{{ georchestra.wars.version }}/{{ item.key }}-generic.war"
+    dest: "/usr/share/lib/georchestra/{{ georchestra.wars.version }}/{{ item.key }}-generic.war"
     validate_certs: false
     force: true
   with_dict: "{{ georchestra_wars }}"
@@ -15,7 +15,7 @@
 - name: symlink webapps in each tomcat instance
   file:
     owner: tomcat
-    src: "/usr/share/lib/georchestra/20.0.1/{{ item.key }}-generic.war"
+    src: "/usr/share/lib/georchestra/{{ georchestra.wars.version }}/{{ item.key }}-generic.war"
     dest: "{{ tomcat_basedir }}/{{ item.value.tomcat }}/webapps/{{ item.key }}.war"
     state: link
     force: yes
@@ -23,8 +23,10 @@
 
 # instances need to be started so that webapps are deployed
 - name: start instances
-  service:
-    name: "tomcat@{{ item }}"
+  systemd:
     state: started
-  with_items: "{{ tomcat_instances.keys() }}"
+    daemon_reload: yes
+    enabled: yes
+    name: "tomcat@{{ item.key }}"
+  with_dict: "{{ tomcat_instances }}"
 

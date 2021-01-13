@@ -1,9 +1,6 @@
 # {{ ansible_managed }}
 {% if item.dest == 'proxy' %}
 
-ProxyPass / http://localhost:{{ tomcat_instances['proxycas']['port'] }}/
-ProxyPassReverse / http://localhost:{{ tomcat_instances['proxycas']['port'] }}/
-
 ProxyPass /casfailed.jsp http://localhost:{{ tomcat_instances['proxycas']['port'] }}/casfailed.jsp
 ProxyPassReverse /casfailed.jsp http://localhost:{{ tomcat_instances['proxycas']['port'] }}/casfailed.jsp
 
@@ -34,5 +31,5 @@ SetEnvIf Referer "^https://{{ georchestra.fqdn|replace('.','\.') }}/" mysdi
   Header set Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept"
 </Location>
 {% endif %}
-ProxyPass /{{ item.dest }}/ http://localhost:{{ tomcat_instances['proxycas']['port'] }}/{{ item.dest }}/
-ProxyPassReverse /{{ item.dest }}/ http://localhost:{{ tomcat_instances['proxycas']['port'] }}/{{ item.dest }}/
+ProxyPass /{{ item.dest }} http://localhost:{{ tomcat_instances['proxycas']['port'] }}/{{ item.dest }}
+ProxyPassReverse /{{ item.dest }} http://localhost:{{ tomcat_instances['proxycas']['port'] }}/{{ item.dest }}

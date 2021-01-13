@@ -1,4 +1,4 @@
 - name: reload apache2
-  service: 
+  systemd: 
     name: "{{ apache_service_name }}"
     state: reloaded

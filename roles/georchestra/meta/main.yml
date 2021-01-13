@@ -3,5 +3,5 @@ dependencies:
   - { role: security, tags: security, when: package_manager == "yum" }
   - { role: openldap, tags: openldap }
   - { role: postgresql, tags: postgresql }
-  - { role: tomcat, tags: tomcat }
   - { role: apache, tags: apache }
+  - { role: tomcat, tags: tomcat }

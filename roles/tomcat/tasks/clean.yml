@@ -12,7 +12,7 @@
   with_items:
   - "{{ tomcat_basedir }}"
   - "{{ logs_basedir }}"
-  - /etc/tomcat9/keystore
+  - "{{ tomcat_keystore_path }}"
 
 #- name: removing pkgs
 #  apt:

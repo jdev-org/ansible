@@ -4,9 +4,11 @@
     version: "{{ mviewer.gitversion }}"
     dest: /var/www/georchestra/mviewer/
 
+# see to test before in 85 note already in list
 - name: apache2 listen on port 85 for mviewer
   lineinfile: 
-    dest: "/etc/{{ apache_service_name }}/ports.conf"
-    regexp: "^Listen 80" line="Listen 80\nListen 85" 
+    dest: "{{ apache_conf }}"
+    regexp: "^Listen 80" 
+    line: "Listen 80\nListen 85" 
     state: present
   notify: reload apache2

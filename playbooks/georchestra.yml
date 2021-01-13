@@ -5,8 +5,12 @@
   roles:
     - georchestra
   vars_files:
+  # note: update to change by default depending on environnement
     - [ "../vars/CentOS.yml" ]  
   vars:
+    geofence: {
+      enabled: false
+    }
     cadastrapp: {
       enabled: false,
       db: {
@@ -60,11 +64,16 @@
       datadir: {
         path: /etc/georchestra,
         gitrepo: "https://github.com/georchestra/datadir",
-        gitversion: 20.0
+        gitversion: 20.1
       },
       debian: {
-        repo: "deb https://packages.georchestra.org/debian 20.0.x main",
+        repo: "deb https://packages.georchestra.org/debian 20.1.x main",
         key: "https://packages.georchestra.org/debian/landry%40georchestra.org.gpg.pubkey"
+      }
+      ,
+      wars: {
+        url: "https://packages.georchestra.org/bot/wars",
+        version: "20.1.x"
       }
     }
     geonetwork: {
@@ -91,8 +100,17 @@
       },
       wms_srslist: [2154, 3857, 3942, 3943, 3944, 3945, 3946, 3947, 3948, 3949, 3950, 4171, 4258, 4326, 23030, 23031, 23032, 32630, 32631, 32632, 4171, 4271, 3758]
     }
+    mviewer: {
+      enabled: true,
+      gitrepo: "https://github.com/geobretagne/mviewer",
+      gitversion: master
+    }
+    sviewer: {
+      enabled: true,
+    }
     geowebcache_datadir: /srv/data/geowebcache/
     extractor_datadir: /srv/data/extractor/
+    tomcat_keystore_path: /etc/georchestra/keystore
     tomcat_keystore_pass: tomcatkstp
     tomcat_basedir: /srv/tomcat
     system_locale: en_US.UTF-8
@@ -134,6 +152,7 @@
       header: { pkg: georchestra-header, tomcat: georchestra },
       console: { pkg: georchestra-console, tomcat: georchestra },
       mapfishapp: { pkg: georchestra-mapfishapp, tomcat: georchestra },
+      mapstore: { pkg: georchestra-mapstore, tomcat: georchestra },
       cadastrapp: { pkg: georchestra-cadastrapp, tomcat: georchestra },
       ROOT: { pkg: georchestra-security-proxy, tomcat: proxycas }
     }

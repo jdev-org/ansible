@@ -117,6 +117,7 @@
   - { src: common, dest: geowebcache }
   - { src: common, dest: header }
   - { src: common, dest: console }
+  - { src: common, dest: mapstore }
   - { src: common, dest: mapfishapp }
   - { src: common, dest: cadastrapp }
   - { src: common, dest: mviewer }
@@ -154,40 +155,10 @@
     state: present
     use: "{{ package_manager }}"
 
-- name: update cacert to enable
+- name: update cacert trust
   command: 
     update-ca-trust force-enable 
   when: package_manager == "yum" 
-
-- name: overwrite jks-keystore hook
-  tags: keystore
-  template:
-    src: jks-keystore
-    dest: /etc/ca-certificates/update.d/jks-keystore
-    mode: 0755
-  when: package_manager == "apt" 
-
-- name: symlink cert for ca-certificates
-  tags: keystore
-  file:
-    src: /var/www/georchestra/ssl/georchestra.crt
-    dest: "{{ cacertificate_path }}/georchestra.crt"
-    state: link
-  register: cert_symlinked
-
-- name: insert selfsigned cert into systemwide store
-  tags: keystore
-  command:
-    "{{ cacerfificate_update_comande }}"
-  when: cert_symlinked is changed 
-
-- name: symlink keystore
-  tags: keystore
-  file:
-    src: /etc/ssl/certs/java/cacerts
-    dest: "{{ java_home }}/jre/lib/security/cacerts"
-    force: yes
-    state: link
 
 - include: clean.yml
   tags: [cleanup, apache_cleanup]

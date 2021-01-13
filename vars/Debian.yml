@@ -22,8 +22,8 @@ tomcat_service_name: tomcat9
 apache_package_name: apache2
 apache_service_name: apache2
 apache_user_name: www-data
+apache_conf: /etc/apache2/ports.conf
 
 cacertificate_package_name: ca-certificates-java
 cacertificate_filename: ca-certificates.crt
-cacertificate_path: /usr/local/share/ca-certificates/
-cacerfificate_update_comande: update-ca-certificate
+cacertificate_path: /etc/ssl/certs/java/cacerts

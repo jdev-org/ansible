@@ -24,3 +24,11 @@
      SSLCACertificateFile /etc/ssl/certs/{{ cacertificate_filename }}
      ServerSignature Off
 </VirtualHost>
+
+<VirtualHost *:85>
+     ServerName localhost
+     DocumentRoot /var/www/georchestra/mviewer
+     LogLevel warn
+     ErrorLog /var/www/georchestra/logs/error-mviewer.log
+     CustomLog /var/www/georchestra/logs/access-mviewer.log "combined"
+</VirtualHost>

@@ -50,9 +50,3 @@
     src: "server-{{ item.key }}.xml.j2"
     dest: "{{ tomcat_basedir }}/{{ item.key }}/conf/server.xml"
   with_dict: "{{ tomcat_instances }}"
-
-- name: enable instance
-  systemd:
-    name: "tomcat@{{ item.key }}"
-    enabled: yes
-  with_dict: "{{ tomcat_instances }}"

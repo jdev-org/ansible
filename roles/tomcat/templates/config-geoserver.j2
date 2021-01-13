@@ -13,4 +13,6 @@ JAVA_OPTS="-Djava.awt.headless=true -XX:+UseConcMarkSweepGC \
 	-server \
 	-XX:SoftRefLRUPolicyMSPerMB=36000 \
 	-XX:NewRatio=2 \
-	-XX:+AggressiveOpts"
+	-XX:+AggressiveOpts \
+	-Djavax.net.ssl.trustStore={{ tomcat_keystore_path }} \
+	-Djavax.net.ssl.trustStorePassword={{ tomcat_keystore_pass }}"

@@ -14,8 +14,16 @@
 - include: config.yml
   tags: config
 
+- include: keystore.yml
+  tags: keystore
+
 - include: sviewer.yml
   tags: sviewer
+  when: mviewer.enabled
+
+- include: mviewer.yml
+  tags: mviewer
+  when: mviewer.enabled
 
 - include: war_cadastrapp.yml
   tags: cadastrapp_war
@@ -32,7 +40,7 @@
 
 - include: nativelibs.yml
   tags: nativelibs
-  when: package_manager == "yum"
+  when: package_manager == "apt"
 
 - include: cadastrapp.yml
   tags: cadastrapp_addon
