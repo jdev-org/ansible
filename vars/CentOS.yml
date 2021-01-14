@@ -14,6 +14,8 @@ postgresql_package_name: postgis25_11, postgresql11-server, postgresql11, postgr
 postgresql_service_name: postgresql-11
 postgresql_pg_hba_path: /var/lib/pgsql/11/data/pg_hba.conf
 
+#https://mirror.ibcp.fr/pub/apache/tomcat/tomcat-9/v9.0.41/bin/apache-tomcat-9.0.41.tar.gz
+
 tomcat_package_name: tomcat, tomcat-webapps
 tomcat_service_name: tomcat
 

@@ -1,0 +1,7 @@
+JAVA_HOME="{{java_home}}"
+JAVA_OPTS="-Djava.awt.headless=true -XX:+UseConcMarkSweepGC \
+	-Xms{{ tomcat_instances.proxycas.xms }} \
+	-Xmx{{ tomcat_instances.proxycas.xmx }} \
+	-Dgeorchestra.datadir={{ georchestra.datadir.path }} \
+	-Djavax.net.ssl.trustStore={{ tomcat_keystore_path }} \
+	-Djavax.net.ssl.trustStorePassword={{ tomcat_keystore_pass }}"

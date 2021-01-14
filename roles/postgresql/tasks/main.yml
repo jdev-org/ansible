@@ -44,18 +44,18 @@
     /usr/pgsql-11/bin/postgresql-11-setup initdb
   when: package_manager == "yum"
 
-- name: update pg_hba conf
+- name: update pg_hba conf IPV4
   lineinfile: 
     dest: "{{ postgresql_pg_hba_path }}" 
-    insertafter: "^#s.IPv4slocal.+" 
-    line: "host {{ georchestra.db.name }}  {{ georchestra.db.user }} 127.0.0.1/32  md5"
+    regexp : "^host.*all.*all.*127\\.0\\.0\\.1.*ident$"
+    line: "host all all 127.0.0.1/32  md5"
   tags: postgresql_conf
   
 - name: update pg_hba conf IPv6
   lineinfile: 
     dest: "{{ postgresql_pg_hba_path }}" 
-    insertafter: "^#s.IPv6slocal.+" 
-    line: "host {{ georchestra.db.name }}  {{ georchestra.db.user }} ::1/128 md5"
+    regexp : "^host.*all.*all.*::1.*ident$"
+    line: "host all all ::1/128 md5"
   tags: postgresql_conf
 
 - name: Test if postgresql is running

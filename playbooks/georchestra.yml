@@ -132,28 +132,40 @@
       georchestra: {
         port: 8280,
         control_port: 8205,
-        xms: 1G,
-        xmx: 2G
+        xms: 512m,
+        xmx: 1G
       },
       geoserver: {
         port: 8380,
         control_port: 8305,
-        xms: 1G,
+        xms: 2G,
+        xmx: 4G
+      },
+      mapstore: {
+        port: 8480,
+        control_port: 8405,
+        xms: 512m,
         xmx: 1G
+      },
+      geonetwork: {
+        port: 8580,
+        control_port: 8505,
+        xms: 512m,
+        xmx: 2G
       }
     }
     georchestra_wars: {
-      analytics: { pkg: georchestra-analytics,  tomcat: georchestra },
+      #analytics: { pkg: georchestra-analytics,  tomcat: georchestra },
       cas: { pkg: georchestra-cas, tomcat: proxycas },
-      extractorapp: { pkg: georchestra-extractorapp,  tomcat: georchestra },
-      geonetwork: { pkg: georchestra-geonetwork3,  tomcat: georchestra },
+      #extractorapp: { pkg: georchestra-extractorapp,  tomcat: georchestra },
+      geonetwork: { pkg: georchestra-geonetwork3,  tomcat: geonetwork },
       geoserver: { pkg: georchestra-geoserver, tomcat: geoserver },
-      geowebcache: { pkg: georchestra-geowebcache, tomcat: georchestra },
+      #geowebcache: { pkg: georchestra-geowebcache, tomcat: georchestra },
       header: { pkg: georchestra-header, tomcat: georchestra },
       console: { pkg: georchestra-console, tomcat: georchestra },
       mapfishapp: { pkg: georchestra-mapfishapp, tomcat: georchestra },
-      mapstore: { pkg: georchestra-mapstore, tomcat: georchestra },
-      cadastrapp: { pkg: georchestra-cadastrapp, tomcat: georchestra },
+      mapstore: { pkg: georchestra-mapstore, tomcat: mapstore },
+      #cadastrapp: { pkg: georchestra-cadastrapp, tomcat: georchestra },
       ROOT: { pkg: georchestra-security-proxy, tomcat: proxycas }
     }
     existing_certificate_path_crt: "none"
