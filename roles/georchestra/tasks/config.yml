@@ -40,6 +40,7 @@
   - { file: log4j.properties, war: analytics, destdir: 'log4j' }
   - { file: cadastrapp.properties, war: cadastrapp, destdir: '' }
   - { file: logback.xml, war: cadastrapp, destdir: '' }
+  - { file: localConfig.json, war: mapstore, destdir: '' }
   notify: restart all tomcats
 
 - name: fix local geoserver url
