@@ -134,14 +134,12 @@
   copy:
       src: "{{ existing_certificate_path_key }}"
       dest: /var/www/georchestra/ssl/georchestra.key
-      remote_src: yes
   when: existing_certificate_path_key != "none"
 
 - name: copy existing certificate crt
   copy:
       src: "{{ existing_certificate_path_crt }}"
       dest: /var/www/georchestra/ssl/georchestra.crt
-      remote_src: yes
   when: existing_certificate_path_crt != "none"
 
 - name: fix perms on certificate

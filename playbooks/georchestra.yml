@@ -168,5 +168,5 @@
       #cadastrapp: { pkg: georchestra-cadastrapp, tomcat: georchestra },
       ROOT: { pkg: georchestra-security-proxy, tomcat: proxycas }
     }
-    existing_certificate_path_crt: "none"
-    existing_certificate_path_key: "none"
+    existing_certificate_path_crt: "/tmp/georchestra.crt"
+    existing_certificate_path_key: "/tmp/georchestra.key"

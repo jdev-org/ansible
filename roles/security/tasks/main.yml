@@ -9,31 +9,54 @@
     enabled: no
   when: "'firewalld' in services"
 
-- name: Check that the Selinux is installed
-  stat:
-    path: /etc/selinux/config
-  register: stat_result
-
 - name: manage selinux
   package: 
     name: libselinux-python
     state: present
     use: "{{ package_manager }}" 
-  when: stat_result.stat.isdir is defined and stat_result.stat.isdir
 
-- name: Disable SELinux
-  selinux:
-    state: disabled
-  when: stat_result.stat.isdir is defined and stat_result.stat.isdir
+- name: manage selinux
+  package: 
+    name: policycoreutils-python
+    state: present
+    use: "{{ package_manager }}" 
+    
+- name: Check that the Selinux is installed
+  stat:
+    path: /etc/selinux/config
+  register: stat_result
 
 # firewall-cmd --permanent --add-service=https
 # firewall-cmd --reload
 # firewall-cmd --list-all
 
-#semanage port -a -t http_port_t -p tcp 85
-#semanage port -a -t http_port_t -p tcp 8180
-#semanage port -a -t http_port_t -p tcp 8109
-#semanage port -a -t http_port_t -p tcp 8280
-#semanage port -a -t http_port_t -p tcp 8209
-#semanage port -a -t http_port_t -p tcp 8380
-#semanage port -a -t http_port_t -p tcp 8309
+- name: Allow georchestra ports
+  seport:
+    ports: "{{ item }}"
+    proto: tcp
+    setype: http_port_t
+    state: present
+  with_items:
+    - 85
+    - 8180
+    - 8105
+    - 8109
+    - 8280
+    - 8205
+    - 8209
+    - 8380
+    - 8305
+    - 8309
+    - 8480
+    - 8405
+    - 8409
+    - 8580
+    - 8505
+    - 8509
+    - 8443
+  when: ansible_selinux is defined and ansible_selinux != False and ansible_selinux.status == 'enabled'
+
+- name: Disable SELinux
+  selinux:
+    state: disabled
+  when: stat_result.stat.isdir is defined and stat_result.stat.isdir

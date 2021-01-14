@@ -61,20 +61,26 @@
     { pat: 'userPassword:: e1NIQX1XMlY4d2UrOFdNanpma28rMUtZVDFZcWZFVDQ9', val: "userPassword: {{ geoserver.privileged.pass }}" }]
     - "{{ openldap.ldifs }}"
 
+# need to add check before installed it
 - name: Add missing ldap module for Centos (cosine)
   command: >
     ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/cosine.ldif
   when: package_manager == "yum"
-  
+  ignore_errors: yes
+
+# need to add check before installed it
 - name: Add missing ldap module for Centos (nis)
   command: >
     ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/nis.ldif
   when: package_manager == "yum"
+  ignore_errors: yes
 
+# need to add check before installed it
 - name: Add missing ldap module for Centos (inetorgperson)
   command: >
     ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/inetorgperson.ldif
   when: package_manager == "yum"
+  ignore_errors: yes
 
 - name: bootstrap the db
   command: >
@@ -102,7 +108,7 @@
     ldapadd -Y EXTERNAL -H ldapi:/// -f "{{ tempdir.stdout }}/memberof.ldif"
     creates=/etc/{{ ldap_path_name }}/slapd.d/cn=config/olcDatabase={2}mdb/olcOverlay={0}memberof.ldif
   when: package_manager == "apt"
-
+  
 - name: temporarly store cleartext admin rootpw
   copy:
     dest: "{{ tempdir.stdout }}/admin-georchestra.pass"
