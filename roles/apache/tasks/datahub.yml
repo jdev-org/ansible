@@ -28,8 +28,8 @@
 
 - name: custom asset
   copy:
-    src: "{{ georchestra.datadir.path }}/datahub/asset/" 
-    dest: "/var/www/georchestra/htdocs/datahub/asset/"
+    src: "{{ georchestra.datadir.path }}/datahub/assets/" 
+    dest: "/var/www/georchestra/htdocs/datahub/assets/"
     owner: root
     group: root
     mode: '0644'
@@ -38,7 +38,7 @@
 - name: custom configuration
   copy:
     src: "{{ georchestra.datadir.path }}/datahub/conf/" 
-    dest: "/var/www/georchestra/htdocs/datahub/asset/configuration/"
+    dest: "/var/www/georchestra/htdocs/datahub/assets/configuration/"
     owner: root
     group: root
     mode: '0644'
